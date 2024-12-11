@@ -65,13 +65,13 @@ function AddContact() {
       };
 
     try {
-        const token = localStorage.getItem("token"); // Pobierz token JWT z LocalStorage
+        const token = localStorage.getItem("token"); 
 
         const response = await fetch("https://localhost:7154/api/Contacts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Prześlij token w nagłówku
+            Authorization: `Bearer ${token}`, 
           },
           body: JSON.stringify(contact),
         });
@@ -155,7 +155,7 @@ function AddContact() {
             ))}
         </select>
         </div>
-        {categoryId === "1" && (
+        {categoryId !== "3" && (
         <div>
             <label>Subcategory:</label>
             <select

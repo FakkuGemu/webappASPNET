@@ -23,6 +23,35 @@ namespace backend.Controllers
         {
             return Ok(await _context.Contacts.ToListAsync());
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetContact(int id)
+        {
+            var contact = await _context.Contacts
+                .Include(c => c.Category)
+                .Include(c => c.Subcategory)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            var contactDto = new ContactDto
+            {
+                Id = contact.Id,
+                Email = contact.Email,
+                Password = contact.Password,
+                FirstName = contact.FirstName,
+                LastName = contact.LastName,
+                PhoneNumber = contact.PhoneNumber,
+                CategoryId = contact.CategoryId,
+                CategoryName = contact.Category?.Name,
+                SubcategoryId = contact.SubcategoryId,
+                SubcategoryName = contact.Subcategory?.Name
+            };
+
+            return Ok(contactDto);
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddContact([FromBody] Contact contact)
@@ -79,30 +108,50 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateContact(int id, [FromBody] Contact contact)
+        public async Task<IActionResult> UpdateContact(int id, [FromBody] ContactDto contactDto)
         {
-            if (id != contact.Id)
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var contact = await _context.Contacts.FindAsync(id);
+            if (contact == null)
+                return NotFound();
+
+            // Map updated fields
+            contact.Email = contactDto.Email;
+            contact.Password = contactDto.Password;
+            contact.FirstName = contactDto.FirstName;
+            contact.LastName = contactDto.LastName;
+            contact.PhoneNumber = contactDto.PhoneNumber;
+            contact.CategoryId = contactDto.CategoryId;
+
+            // Resolve subcategoryId by subcategoryName
+            if (contactDto.CategoryId != 3 && !string.IsNullOrEmpty(contactDto.SubcategoryName))
             {
-                return BadRequest();
+                var subcategory = await _context.Subcategories
+                    .FirstOrDefaultAsync(s => s.Name == contactDto.SubcategoryName && s.CategoryId == contactDto.CategoryId);
+
+                if (subcategory == null)
+                    return BadRequest("Invalid subcategory name.");
+
+                contact.SubcategoryId = subcategory.Id;
+            }
+            else if (contactDto.CategoryId == 3 && !string.IsNullOrEmpty(contactDto.SubcategoryName))
+            {
+                var subcategory = await _context.Subcategories
+                .FirstOrDefaultAsync(s => s.Name == contactDto.SubcategoryName && s.CategoryId == contactDto.CategoryId);
+
+                if (subcategory == null)
+                    return BadRequest("Invalid subcategory name.");
+
+                contact.SubcategoryId = subcategory.Id;
+            }
+            else
+            {
+                contact.SubcategoryId = null;
             }
 
-            _context.Entry(contact).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Contacts.Any(e => e.Id == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
