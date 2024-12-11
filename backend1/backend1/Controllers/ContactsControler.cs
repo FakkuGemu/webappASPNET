@@ -23,11 +23,18 @@ namespace backend.Controllers
         {
             return Ok(await _context.Contacts.ToListAsync());
         }
-        [AllowAnonymous]
+
         [HttpPost]
         public async Task<IActionResult> AddContact([FromBody] Contact contact)
         {
             Console.WriteLine($"Received contact: {System.Text.Json.JsonSerializer.Serialize(contact)}");
+            // Check if the email already exists
+            var existingContact = _context.Contacts.FirstOrDefault(c => c.Email == contact.Email);
+            if (existingContact != null)
+            {
+                Console.WriteLine("Email already exists: " + contact.Email);
+                return Conflict(new { error_message = "A contact with this email("+ contact.Email +") already exists." });
+            }
 
             if (!ModelState.IsValid)
             {
@@ -70,7 +77,7 @@ namespace backend.Controllers
             return Ok(contact);
         
         }
-        [Authorize]
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateContact(int id, [FromBody] Contact contact)
         {
@@ -99,7 +106,7 @@ namespace backend.Controllers
 
             return NoContent();
         }
-        [Authorize]
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContact(int id)
         {

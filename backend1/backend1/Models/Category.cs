@@ -9,6 +9,6 @@ namespace backend.Models
         [Required]
         public string Name { get; set; }
 
-        public ICollection<Subcategory> Subcategories { get; set; }
+        public ICollection<Subcategory>? Subcategories { get; set; }
     }
 }
