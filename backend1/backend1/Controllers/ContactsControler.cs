@@ -57,7 +57,6 @@ namespace backend.Controllers
         public async Task<IActionResult> AddContact([FromBody] Contact contact)
         {
             Console.WriteLine($"Received contact: {System.Text.Json.JsonSerializer.Serialize(contact)}");
-            // Check if the email already exists
             var existingContact = _context.Contacts.FirstOrDefault(c => c.Email == contact.Email);
             if (existingContact != null)
             {
@@ -117,7 +116,6 @@ namespace backend.Controllers
             if (contact == null)
                 return NotFound();
 
-            // Map updated fields
             contact.Email = contactDto.Email;
             contact.Password = contactDto.Password;
             contact.FirstName = contactDto.FirstName;
@@ -125,7 +123,6 @@ namespace backend.Controllers
             contact.PhoneNumber = contactDto.PhoneNumber;
             contact.CategoryId = contactDto.CategoryId;
 
-            // Resolve subcategoryId by subcategoryName
             if (contactDto.CategoryId != 3 && !string.IsNullOrEmpty(contactDto.SubcategoryName))
             {
                 var subcategory = await _context.Subcategories

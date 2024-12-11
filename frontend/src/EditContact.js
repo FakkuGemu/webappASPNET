@@ -2,26 +2,23 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 function EditContact() {
-  const { id } = useParams(); // Get the contact ID from the URL
+  const { id } = useParams(); 
   const [contact, setContact] = useState(null);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch categories
     fetch("https://localhost:7154/api/Categories")
       .then((response) => response.json())
       .then((data) => setCategories(data))
       .catch((error) => console.error("Failed to fetch categories", error));
 
-    // Fetch contact details
     fetch(`https://localhost:7154/api/Contacts/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setContact(data);
 
-        // Fetch subcategories for the contact's category if available
         if (data.categoryId) {
           fetch(`https://localhost:7154/api/Subcategories/byCategory/${data.categoryId}`)
             .then((response) => response.json())
@@ -41,7 +38,6 @@ function EditContact() {
     const selectedCategoryId = e.target.value;
     setContact({ ...contact, categoryId: selectedCategoryId, subcategoryName: "" });
 
-    // Fetch subcategories for the selected category
     fetch(`https://localhost:7154/api/Subcategories/byCategory/${selectedCategoryId}`)
       .then((response) => response.json())
       .then((data) => setSubcategories(data))
@@ -72,7 +68,7 @@ function EditContact() {
       body: JSON.stringify(updatedContact),
     });
 
-    navigate("/"); // Redirect to the contact list after editing
+    navigate("/"); 
   };
 
   if (!contact) {

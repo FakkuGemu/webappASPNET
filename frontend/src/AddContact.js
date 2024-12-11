@@ -15,7 +15,6 @@ function AddContact() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    // Fetch categories and subcategories from the backend
     fetch("https://localhost:7154/api/Categories")
       .then((response) => response.json())
       .then((data) => setCategories(data))
@@ -44,7 +43,6 @@ function AddContact() {
     setError("");
     setSuccess("");
 
-    // Validate password complexity
     const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
       setError("Password must contain at least 8 characters, including uppercase, lowercase, and a number.");
@@ -81,7 +79,6 @@ function AddContact() {
       }
 
       setSuccess("Contact added successfully!");
-      // Clear form
       setEmail("");
       setPassword("");
       setFirstName("");

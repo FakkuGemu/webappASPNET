@@ -23,8 +23,8 @@ function Login({ setIsAuthenticated }) {
       }
 
       const data = await response.json();
-      localStorage.setItem("token", data.token); // Przechowujemy token w localStorage
-      setIsAuthenticated(true); // Aktualizujemy stan aplikacji
+      localStorage.setItem("token", data.token);
+      setIsAuthenticated(true);
     } catch (err) {
       setError(err.message);
     }

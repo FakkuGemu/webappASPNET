@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function Contacts({ isAuthenticated }) {
   const [contacts, setContacts] = useState([]);
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     fetch("https://localhost:7154/api/Contacts")
